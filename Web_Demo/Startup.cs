@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Web_Demo.Model;
 
 namespace Web_Demo
 {
@@ -24,6 +25,8 @@ namespace Web_Demo
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddDbContext<LMSDBContex>();
+            services.AddScoped<ILMSDataStore, LMSDataStore>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

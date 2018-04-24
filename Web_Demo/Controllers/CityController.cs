@@ -12,25 +12,44 @@ namespace Web_Demo.Controllers
     [Route("api/city")]
     public class CityController : Controller
     {
+        private ILMSDataStore _dbStore;
+
+        public CityController(ILMSDataStore dbStore)
+        {
+            _dbStore = dbStore;
+        }
+
         // GET: api/city
         [HttpGet]
         public JsonResult Get()
         {
-            var result = CityDataStore.getInstance().GetAllCities();
+            //data from memory
+            //var result = CityDataStore.getInstance().GetAllCities();
+
+            //data from DB
+            var result = _dbStore.GetAllCities();
             return new JsonResult(result);
+
         }
 
         // GET api/city/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var cityResult = CityDataStore.getInstance().GetCityByID(id);
+            //data from memory
+            //var cityResult = CityDataStore.getInstance().GetCityByID(id);
+
+            //data from DB
+            var cityResult = _dbStore.GetCity(id);
             IActionResult result;
 
             //请检查返回值是不是 null
-            if(cityResult == null){
+            if (cityResult == null)
+            {
                 result = NotFound();
-            }else{
+            }
+            else
+            {
                 result = Ok(cityResult);
             }
             return result;
@@ -43,42 +62,57 @@ namespace Web_Demo.Controllers
             //TODO: check value is valid
             //input 值跟 model 对不上, 相应的 property 的值就是 null
 
-            CityDataStore.getInstance().AddCity(value);
+            //Memory
+            //CityDataStore.getInstance().AddCity(value);
 
-            return Ok(value);
+            //DB
+            CityDto newCity = CityDto.CreateCityFromBody(value);
+            _dbStore.AddNewCity(newCity);
+
+            return Ok(newCity);
         }
 
         // PUT api/city/5
-        //[HttpPut("{id}")]
-        [HttpPut]
+        [HttpPut("{id}")]
+        //[HttpPut]
         public IActionResult Put(int id, [FromBody]CityDto value)
         {
             //TODO: check value is valid
+            //IActionResult result;
+            //Memory
+            //CityDto resultCity = CityDataStore.getInstance().UpdateCity(value);
+            //if (resultCity != null)
+            //{
+            //    result = Accepted(resultCity);
+            //}
+            //else
+            //{
+            //    result = NotFound();
+            //}
+            //return result;
 
-            CityDto resultCity = CityDataStore.getInstance().UpdateCity(value);
-            IActionResult result;
-
-            if (resultCity !=null ){
-                result = Accepted(resultCity);
-            }else{
-                result = NotFound();
-            }
-            return result;
+            //DB
+            _dbStore.EditCity(id, value);
+            return Ok();
         }
+
 
         // DELETE api/city/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            bool isRecordExist = CityDataStore.getInstance().DeleteCity(id);
-            IActionResult result;
+            //Memory
+            //bool isRecordExist = CityDataStore.getInstance().DeleteCity(id);
+            //IActionResult result;
 
-            if(isRecordExist){
-                result = NoContent();
-            }else{
-                result = NotFound();
-            }
-            return result;
+            //if(isRecordExist){
+            //    result = NoContent();
+            //}else{
+            //    result = NotFound();
+            //}
+            //return result;
+            _dbStore.deleteCity(id);
+            return Ok();
         }
     }
 }
